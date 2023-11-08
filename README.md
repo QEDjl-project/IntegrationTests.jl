@@ -1,5 +1,7 @@
 # IntegrationTests
 
+[![Code Style: Blue](https://img.shields.io/badge/code%20style-blue-4495d1.svg)](https://github.com/invenia/BlueStyle)
+
 `IntegrationTests` takes a `Project.toml`, searches for a specific package in the dependency graph and returns a list of packages that use the specified package.
 
 ⚠️ DISCLAIMER ⚠️
