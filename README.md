@@ -64,4 +64,19 @@ end
 
 Suppose we change `foo(i) = i + 3` to `foo(i, j) = i + j + 3`. The `bar()` function in `PkgB` will no longer work because `bar()` calls `foo()` with only one parameter. The integration test will detect the problem and allow the developer to fix the problem before the pull request is merged. For example, a fix can be developed for `PkgB` that calls `foo()` with two arguments.
 
-For more details please read the [documentation](https://qedjl-project.github.io/IntegrationTests.jl/main).
+# Functionality
+
+`IntegrationTests.jl` provides CI configuration files and a tool for the dynamic generation of integration tests for a specific project. The tool determines the dependent packages based on a given `Project.toml` of the entire package ecosystem. This is possible because a `Project.toml` of a package describes the dependencies as a graph. The graph can also contain the dependencies of the dependencies. Therefore, you can create a dependency graph of a package ecosystem. A package ecosystem can look like this:
+
+```mermaid
+graph TD
+   qed(QED.jl) --> base(QEDbase.jl)
+   qed --> processes(QEDprocesses.jl) --> base
+   qed --> fields(QEDfields.jl) --> base
+   processes --> fields
+   qed --> events(QEDevents.jl) --> base
+```
+
+[Project.toml](https://github.com/QEDjl-project/QED.jl/commit/08613adadea8a85bb4cbf47065d118eaec6f03d6) of the `QED.jl` package.
+
+For example, if `QEDfields.jl` is changed, `IntegrationTests.jl` returns that `QED.jl` and `QEDprocesses.jl` are dependent on `QEDfields.jl`, and we can generate the integration test jobs. Full CI pipeline examples for GitLab CI and GitHub Actions can be found in the [Pipeline Tutorials](https://qedjl-project.github.io/IntegrationTests.jl/main/pipeline_tutorials.html) section. For more details on the `IntegrationTests.jl` tool, see the [Integration Test Tool](https://qedjl-project.github.io/IntegrationTests.jl/main/integration_test_tool.html) section.

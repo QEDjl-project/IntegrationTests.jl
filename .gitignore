@@ -2,3 +2,7 @@ Manifest.toml
 
 # visual studio code project folder
 .vscode
+
+# docs/make.jl copies the README.md from the project root into the docs/src folder, rename it, renders the documentation 
+# and deletes it again. So this rule is not necessary, but it avoids an accidental push.
+docs/src/index.md
