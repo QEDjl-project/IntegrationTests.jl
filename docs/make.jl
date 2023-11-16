@@ -52,4 +52,4 @@ makedocs(;
 # delete README.md in the doc/src folder so that no one can accidentally edit the wrong file
 rm(index_path)
 
-deploydocs(; repo="github.com/QEDjl-project/QEDbase.jl.git", push_preview=false)
+deploydocs(; repo="github.com/QEDjl-project/IntegrationTests.jl.git", push_preview=false)
