@@ -3,6 +3,8 @@ module IntegrationTests
 using Pkg
 using PkgDependency
 
+export depending_projects
+
 """
     depending_projects(package_name, package_prefix, project_tree)
 
@@ -25,18 +27,18 @@ function depending_projects(
 )::AbstractVector{String}
     packages::AbstractVector{String} = []
     visited_packages::AbstractVector{String} = []
-    traverse_tree!(package_name, package_filter, project_tree, packages, visited_packages)
+    _traverse_tree!(package_name, package_filter, project_tree, packages, visited_packages)
     return packages
 end
 
 """
-    traverse_tree!(package_name::String, package_filter, project_tree, packages::AbstractVector{String}, visited_packages::AbstractVector{String})
+    _traverse_tree!(package_name::String, package_filter, project_tree, packages::AbstractVector{String}, visited_packages::AbstractVector{String})
 
 Traverse a project tree and add any package to `packages`, that has the package `package_name` as a dependency. Ignore all packages that are not included in `package_filter`.
 See [`depending_projects`](@ref)
 
 """
-function traverse_tree!(
+function _traverse_tree!(
     package_name::String,
     package_filter,
     project_tree,
@@ -66,7 +68,7 @@ function traverse_tree!(
                 end
             end
             # independent of a match, under investigate all dependencies too, because they can also have the package as dependency
-            traverse_tree!(
+            _traverse_tree!(
                 package_name,
                 package_filter,
                 project_tree[project_name_version],

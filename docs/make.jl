@@ -34,6 +34,7 @@ pages = [
     "Home" => "index.md",
     "Integration Test Tool" => "integration_test_tool.md",
     "Pipeline Tutorials" => "pipeline_tutorials.md",
+    "References" => "api.md",
 ]
 
 makedocs(;

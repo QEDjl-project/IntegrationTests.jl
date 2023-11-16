@@ -4,12 +4,14 @@ using Test
 import Term.Trees: Tree
 
 # set environment variable PRINTTREE=on to visualize the project trees of the testsets
-printTree::Bool = haskey(ENV, "PRINTTREE")
+function printTree()::Bool
+    return haskey(ENV, "PRINTTREE")
+end
 
 @testset "direct dependency to main" begin
     project_tree = Dict("MyMainProject.jl 1.0.0" => Dict("MyDep1.jl 1.0.0" => Dict()))
 
-    if printTree
+    if printTree()
         print(Tree(project_tree; name="direct dependency to main"))
     end
 
@@ -48,7 +50,7 @@ end
                             )
                         )
     #! format: on
-    if printTree
+    if printTree()
         print(Tree(project_tree; name="complex dependencies"))
     end
 
@@ -98,7 +100,7 @@ end
         ),
     )
 
-    if printTree
+    if printTree()
         print(Tree(project_tree; name="circular dependencies"))
     end
 
