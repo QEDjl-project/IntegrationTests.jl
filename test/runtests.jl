@@ -21,16 +21,144 @@ end
     ) == ["MyMainProject.jl"]
     # dependency does not exist and prefix is correct
     @test isempty(
-        IntegrationTests.depending_projects("MyDep2.jl", ["MyMainProject.jl"], project_tree)
+        IntegrationTests.depending_projects("MyDep2.jl", "MyMainProject.jl", project_tree)
     )
     # dependency exist and prefix is incorrect
     @test isempty(
-        IntegrationTests.depending_projects("MyDep1.jl", ["ExternProject.jl"], project_tree)
+        IntegrationTests.depending_projects("MyDep1.jl", "ExternProject.jl", project_tree)
     )
     # dependency does not exist and prefix is incorrect
     @test isempty(
-        IntegrationTests.depending_projects("MyDep2.jl", ["ExternProject.jl"], project_tree)
+        IntegrationTests.depending_projects("MyDep2.jl", "ExternProject.jl", project_tree)
     )
+end
+
+@testset "test package filter api" begin
+    project_tree = Dict(
+        "MyMainProject.jl 1.0.0" => Dict(
+            "MyDep1.jl 1.0.0" => Dict(
+                "YourDep1.jl 1.0.0" => Dict("MyDep3.jl 1.0.0" => Dict()),
+                "MyDep2.jl 1.0.0" => Dict(
+                    "ForeignDep1.jl 1.0.0" => Dict(Dict("MyDep3.jl 1.0.0" => Dict())),
+                ),
+            ),
+            "yourDep2.jl 1.0.0" => Dict("MyDep1.jl 1.0.0" => Dict()),
+        ),
+    )
+    if printTree()
+        print(Tree(project_tree; name="test package filter api"))
+    end
+
+    @testset "single package name" begin
+        @test sort(depending_projects("MyDep1.jl", "", project_tree)) ==
+            sort(["MyMainProject.jl", "yourDep2.jl"])
+
+        @test sort(depending_projects("MyDep1.jl", "MyMainProject.jl", project_tree)) ==
+            sort(["MyMainProject.jl"])
+
+        @test sort(depending_projects("yourDep2.jl", "MyMainProject.jl", project_tree)) ==
+            sort(["MyMainProject.jl"])
+    end
+
+    @testset "regex" begin
+        @test sort(depending_projects("MyDep2.jl", r"My*", project_tree)) ==
+            sort(["MyDep1.jl"])
+
+        @test sort(depending_projects("MyDep2.jl", r"MyDep*", project_tree)) == sort([])
+        @test sort(
+            depending_projects("MyDep2.jl", r"MyDep*|^MyMainProject.jl$", project_tree)
+        ) == sort(["MyDep1.jl"])
+
+        @test sort(depending_projects("MyDep1.jl", r"^MyMainProject.jl$", project_tree)) ==
+            sort(["MyMainProject.jl"])
+
+        @test sort(
+            depending_projects(
+                "MyDep1.jl", r"^MyMainProject.jl$|^yourDep2.jl$", project_tree
+            ),
+        ) == sort(["MyMainProject.jl", "yourDep2.jl"])
+
+        @test sort(
+            depending_projects("MyDep3.jl", r"^MyMainProject.jl$|^MyDep*", project_tree)
+        ) == sort([])
+
+        @test sort(
+            depending_projects(
+                "MyDep3.jl", r"^MyMainProject.jl$|^MyDep*|^Foreign*", project_tree
+            ),
+        ) == sort(["ForeignDep1.jl"])
+
+        @test sort(
+            depending_projects(
+                "MyDep3.jl", r"^MyMainProject.jl$|^MyDep*|^Your*", project_tree
+            ),
+        ) == sort(["YourDep1.jl"])
+
+        @test sort(
+            depending_projects(
+                "MyDep3.jl", r"^MyMainProject.jl$|^MyDep*|^Foreign*|^Your*", project_tree
+            ),
+        ) == sort(["ForeignDep1.jl", "YourDep1.jl"])
+
+        @test sort(depending_projects("MyDep1.jl", r"", project_tree)) ==
+            sort(["MyMainProject.jl", "yourDep2.jl"])
+    end
+
+    @testset "list of package names" begin
+        @test sort(depending_projects("MyDep1.jl", ["MyMainProject.jl"], project_tree)) ==
+            sort(["MyMainProject.jl"])
+
+        @test sort(
+            depending_projects("MyDep2.jl", ["MyMainProject.jl", "MyDep1.jl"], project_tree)
+        ) == sort(["MyDep1.jl"])
+
+        @test sort(
+            depending_projects(
+                "MyDep3.jl",
+                ["MyMainProject.jl", "MyDep1.jl", "ForeignDep1.jl", "MyDep3.jl"],
+                project_tree,
+            ),
+        ) == sort([])
+
+        @test sort(
+            depending_projects(
+                "MyDep3.jl",
+                [
+                    "MyMainProject.jl",
+                    "MyDep1.jl",
+                    "MyDep2.jl",
+                    "ForeignDep1.jl",
+                    "MyDep3.jl",
+                ],
+                project_tree,
+            ),
+        ) == sort(["ForeignDep1.jl"])
+
+        @test sort(
+            depending_projects(
+                "MyDep3.jl",
+                [
+                    "YourDep1.jl",
+                    "MyMainProject.jl",
+                    "MyDep1.jl",
+                    "MyDep2.jl",
+                    "ForeignDep1.jl",
+                    "MyDep3.jl",
+                ],
+                project_tree,
+            ),
+        ) == sort(["YourDep1.jl", "ForeignDep1.jl"])
+
+        # using strings and regex in a vector is not allowed
+        # use instead a single regex
+        @test_throws MethodError depending_projects(
+            "MyDep2.jl", ["MyMainProject.jl", r"MyDep1.jl"], project_tree
+        )
+
+        @test_throws ArgumentError depending_projects(
+            "MyDep2.jl", Vector{String}(), project_tree
+        )
+    end
 end
 
 @testset "complex dependencies" begin
