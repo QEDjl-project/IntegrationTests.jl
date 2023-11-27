@@ -42,60 +42,61 @@ end
 """
     depending_projects(
         package_name::AbstractString, 
-        package_filter::AbstractVector{TString} where {TString<:AbstractString}, 
+        package_filter::AbstractVector{<:AbstractString}, 
         project_tree::AbstractDict=PkgDependency.builddict(Pkg.project().uuid, Pkg.project())
     ) -> Vector{String}
-
-Returns a list of packages that have the package `package_name` as a dependency. 
-
-# Arguments
-    
-- `package_name`: Name of the dependency
-- `package_filter`: Ignore all packages that do not match `package_filter`. This includes the 
-        top node package of the graph. Child nodes always are checked for `package_name`, but 
-        they are not traveres if they do not match `package_filter`. Must be not empty.
-- `project_tree`: Project tree, where to search the dependent packages. Each (sub-) package 
-        needs to be AbstractDict{String, AbstractDict}
-    
-!!! note 
-    If you want to use a combination of srings and regexes in a vector, you should use a pure 
-    regex instead.
-
-# Returns
-
-all packages which have the searched dependency
-
 """
 function depending_projects(
     package_name::AbstractString,
-    package_filter::AbstractVector{TString},
+    package_filter::AbstractVector{<:AbstractString},
     project_tree::AbstractDict=PkgDependency.builddict(Pkg.project().uuid, Pkg.project()),
-)::Vector{String} where {TString<:AbstractString}
+)::Vector{String}
     packages::Vector{String} = []
     visited_packages::Vector{String} = []
 
     if length(package_filter) == 0
         throw(ArgumentError("package_filter must not be empty"))
-    else
-        regex_string = ""
-        for (i, s) in enumerate(package_filter)
-            if i == length(package_filter)
-                regex_string *= "^$(s)\$"
-            else
-                regex_string *= "^$(s)\$|"
-            end
-        end
-        reg = Regex(regex_string)
     end
 
-    _traverse_tree!(package_name, reg, project_tree, packages, visited_packages)
+    _traverse_tree!(package_name, package_filter, project_tree, packages, visited_packages)
     return packages
+end
+
+"""
+    _match_package_filter(
+        package_filter::Union{<:AbstractString,Regex}, 
+        package::AbstractString
+    )::Bool
+
+Check if `package_filter` contains `package`. Wrapper function for `contains()` and `in()`.
+
+# Returns
+
+- `true` if it matches.
+
+"""
+function _match_package_filter(
+    package_filter::Union{<:AbstractString,Regex}, package::AbstractString
+)::Bool
+    return contains(package, package_filter)
+end
+
+"""
+    _match_package_filter(
+        package_filter::AbstractVector{<:AbstractString}, 
+        package::AbstractString
+    )::Bool
+"""
+function _match_package_filter(
+    package_filter::AbstractVector{<:AbstractString}, package::AbstractString
+)::Bool
+    return package in package_filter
 end
 
 """
     _traverse_tree!(
         package_name::AbstractString, 
-        package_filter::Union{<:AbstractString,Regex}, 
+        package_filter::Union{<:AbstractString,Regex,AbstractVector{<:AbstractString}}, 
         project_tree::AbstractDict, 
         packages::AbstractVector{<:AbstractString},
         visited_packages::AbstractVector{<:AbstractString}
@@ -117,7 +118,7 @@ Traverse the project tree and add any package to `packages` that has the package
 """
 function _traverse_tree!(
     package_name::AbstractString,
-    package_filter::Union{<:AbstractString,Regex},
+    package_filter::Union{<:AbstractString,Regex,AbstractVector{<:AbstractString}},
     project_tree::AbstractDict,
     packages::AbstractVector{<:AbstractString},
     visited_packages::AbstractVector{<:AbstractString},
@@ -132,11 +133,11 @@ function _traverse_tree!(
         end
 
         # do not traverse packages that don't match the given filter
-        if !contains(project_name, package_filter)
+        if !_match_package_filter(package_filter, project_name)
             continue
         end
 
-        push!(visited_packages, project_name)
+        push!(visited_packages, String(project_name))
 
         # independent of a match, traverse all dependencies because they can also have the package as dependency
         _traverse_tree!(
