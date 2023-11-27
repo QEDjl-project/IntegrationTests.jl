@@ -1,13 +1,13 @@
 # References
 
-# Public API
+## Public API
 
 ```@autodocs
 Modules = [IntegrationTests]
 Private = false
 ```
 
-# Internal API
+## Internal API
 
 ```@autodocs
 Modules = [IntegrationTests]

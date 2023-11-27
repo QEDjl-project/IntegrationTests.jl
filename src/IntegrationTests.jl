@@ -8,7 +8,7 @@ export depending_projects
 """
     depending_projects(
         package_name::AbstractString, 
-        package_filter::Union{TString,Regex} where {TString<:AbstractString}, 
+        package_filter::Union{<:AbstractString,Regex}
         project_tree::AbstractDict=PkgDependency.builddict(Pkg.project().uuid, Pkg.project())
     ) -> Vector{String}
 
@@ -18,21 +18,21 @@ Returns a list of packages that have the package `package_name` as a dependency.
 
 - `package_name`: Name of the dependency
 - `package_filter`: Ignore all packages that do not match `package_filter`. This includes the 
-        top node package of the graph. Child nodes always are checked for `package_name`, but 
-        they are not traveres if they do not match `package_filter`.
-- `project_tree`: Project tree, where to search the dependent packages. Each (sub-) package 
-        needs to be AbstractDict{String, AbstractDict}
+        top node package of the graph. Child nodes are always checked for `package_name`, but 
+        they are not traversed if they do not match `package_filter`.
+- `project_tree`: Project tree in which to search for dependent packages. Each (sub-)package 
+        needs to be `AbstractDict{String, AbstractDict}`
 
 # Returns
 
-all packages which have the searched dependency
+A `Vector{String}` containing the names of all packages that have the given dependency.
 
 """
 function depending_projects(
     package_name::AbstractString,
-    package_filter::Union{TString,Regex},
+    package_filter::Union{<:AbstractString,Regex},
     project_tree::AbstractDict=PkgDependency.builddict(Pkg.project().uuid, Pkg.project()),
-)::Vector{String} where {TString<:AbstractString}
+)::Vector{String}
     packages::Vector{String} = []
     visited_packages::Vector{String} = []
     _traverse_tree!(package_name, package_filter, project_tree, packages, visited_packages)
@@ -95,13 +95,13 @@ end
 """
     _traverse_tree!(
         package_name::AbstractString, 
-        package_filter::Union{TString,Regex}, 
+        package_filter::Union{<:AbstractString,Regex}, 
         project_tree::AbstractDict, 
-        packages::AbstractVector{String} where {TString<:AbstractString}, 
-        visited_packages::AbstractVector{String} where {TString<:AbstractString}
+        packages::AbstractVector{<:AbstractString},
+        visited_packages::AbstractVector{<:AbstractString}
     )
 
-Traverse a project tree and add any package to `packages`, that has the package `package_name` as a dependency. 
+Traverse the project tree and add any package to `packages` that has the package `package_name` as a dependency.
 
 # Arguments
     
@@ -117,41 +117,47 @@ Traverse a project tree and add any package to `packages`, that has the package 
 """
 function _traverse_tree!(
     package_name::AbstractString,
-    package_filter::Union{TString,Regex},
+    package_filter::Union{<:AbstractString,Regex},
     project_tree::AbstractDict,
-    packages::AbstractVector{TString},
-    visited_packages::AbstractVector{TString},
-) where {TString<:AbstractString}
+    packages::AbstractVector{<:AbstractString},
+    visited_packages::AbstractVector{<:AbstractString},
+)
     for project_name_version in keys(project_tree)
         # remove project version from string -> usual shape: `packageName.jl version`
         project_name = split(project_name_version)[1]
-        # fullfil the requirements
-        # - package matches package_filter
-        # - the dependency is not nothing (I think this representate, that the package was already set as dependency of a another package and therefore do not repead the dependencies)
-        # - has dependency
-        # - was not already checked
-        if contains(project_name, package_filter) &&
-            project_tree[project_name_version] !== nothing &&
-            !isempty(project_tree[project_name_version]) &&
-            !(project_name in visited_packages)
-            # only investigate each package one time
-            # assumption: package name with it's dependency is unique
-            push!(visited_packages, project_name)
-            for dependency_name_version in keys(project_tree[project_name_version])
-                # dependency matches, add to packages
-                if startswith(dependency_name_version, package_name)
-                    push!(packages, project_name)
-                    break
-                end
-            end
-            # independent of a match, under investigate all dependencies too, because they can also have the package as dependency
-            _traverse_tree!(
-                package_name,
-                package_filter,
-                project_tree[project_name_version],
-                packages,
-                visited_packages,
-            )
+
+        # do not traverse packages further that we have already seen
+        if project_name in visited_packages
+            continue
+        end
+
+        # do not traverse packages that don't match the given filter
+        if !contains(project_name, package_filter)
+            continue
+        end
+
+        push!(visited_packages, project_name)
+
+        # independent of a match, traverse all dependencies because they can also have the package as dependency
+        _traverse_tree!(
+            package_name,
+            package_filter,
+            project_tree[project_name_version],
+            packages,
+            visited_packages,
+        )
+
+        # if the dependency is nothing, continue (I think this represents that the package was already set as dependency of a another package and therefore does not repeat the dependency)
+        if isnothing(project_tree[project_name_version]) ||
+            isempty(project_tree[project_name_version])
+            continue
+        end
+
+        # search dependencies for the requested one
+        if any(
+            startswith(x, package_name) for x in keys(project_tree[project_name_version])
+        )
+            push!(packages, project_name)
         end
     end
 end
