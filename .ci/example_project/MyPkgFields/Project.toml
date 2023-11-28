@@ -1,0 +1,8 @@
+name = "MyPkgFields"
+uuid = "c72b09fc-5bb5-4484-ace2-6d82692cb91a"
+authors = ["Simeon Ehrig <s.ehrig@hzdr.de>"]
+version = "0.1.0"
+
+[deps]
+JSON = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+MyPkgBase = "76397a32-043b-48e9-b3fc-0f404cb56028"

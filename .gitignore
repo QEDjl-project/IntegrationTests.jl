@@ -1,4 +1,8 @@
 Manifest.toml
+# allow Manifest.toml for example projects, because the packages are not registered 
+# and uses relative paths for the dependencies
+!.ci/example_project/*/Manifest.toml
+
 
 # visual studio code project folder
 .vscode
