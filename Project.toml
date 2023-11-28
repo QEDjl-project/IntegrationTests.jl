@@ -3,6 +3,10 @@ uuid = "6be7cfa2-1838-408e-bc49-3a824ac3a1fb"
 authors = ["Simeon Ehrig <s.ehrig@hzdr.de> and contributors"]
 version = "0.1.0-DEV"
 
+[deps]
+Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+PkgDependency = "9eb5382b-762c-48ca-8139-e736883fe800"
+
 [compat]
 julia = "1"
 
