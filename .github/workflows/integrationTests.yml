@@ -38,3 +38,28 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - name: Run integration test script
         run: julia --project=${GITHUB_WORKSPACE} .ci/getDeps.jl
+  
+  generate:
+    name: Github Action - Generator Integration Jobs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: julia-actions/setup-julia@v1
+        with:
+          version: 1.9
+          arch: x64
+      - uses: julia-actions/cache@v1
+      - uses: julia-actions/julia-buildpkg@v1
+      - id: set-matrix
+        run: echo "::set-output name=matrix::$(julia --project=${GITHUB_WORKSPACE} .ci/generateGithubActions.jl 2> /dev/null)"
+    outputs:
+        matrix: ${{ steps.set-matrix.outputs.matrix }}
+
+  run-matrix:
+    needs: generate
+    runs-on: ubuntu-latest
+    strategy:
+        matrix:
+            package: ${{ fromJson(needs.generate.outputs.matrix) }}
+    steps:
+        - run: echo "run Integration Test for package ${{ matrix.package }}"
