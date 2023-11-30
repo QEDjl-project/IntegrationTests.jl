@@ -8,6 +8,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 PkgDependency = "9eb5382b-762c-48ca-8139-e736883fe800"
 
 [compat]
+PkgDependency = "0.4"
 julia = "1"
 
 [extras]
