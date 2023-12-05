@@ -80,3 +80,7 @@ graph TD
 [Project.toml](https://github.com/QEDjl-project/QED.jl/commit/08613adadea8a85bb4cbf47065d118eaec6f03d6) of the `QED.jl` package.
 
 For example, if `QEDfields.jl` is changed, `IntegrationTests.jl` returns that `QED.jl` and `QEDprocesses.jl` are dependent on `QEDfields.jl`, and we can generate the integration test jobs. Full CI pipeline examples for GitLab CI and GitHub Actions can be found in the [Pipeline Tutorials](https://qedjl-project.github.io/IntegrationTests.jl/main/pipeline_tutorials.html) section. For more details on the `IntegrationTests.jl` tool, see the [Integration Test Tool](https://qedjl-project.github.io/IntegrationTests.jl/main/integration_test_tool.html) section.
+
+# Credits
+
+This work was partly funded by the [Center for Advanced Systems Understanding (CASUS)](https://www.casus.science) that is financed by Germany’s Federal Ministry of Education and Research (BMBF) and by the Saxon Ministry for Science, Culture and Tourism (SMWK) with tax funds on the basis of the budget approved by the Saxon State Parliament.
