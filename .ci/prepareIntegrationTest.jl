@@ -41,10 +41,4 @@ function create_package_eco_system(base_path)
     return Nothing
 end
 
-if !isinteractive()
-    tmp_path = mktempdir(; cleanup=false)
-    println(tmp_path)
-    create_package_eco_system(tmp_path)
-end
-
 end
