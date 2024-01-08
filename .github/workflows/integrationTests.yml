@@ -52,7 +52,7 @@ jobs:
       - uses: julia-actions/cache@v1
       - uses: julia-actions/julia-buildpkg@v1
       - id: set-matrix
-        run: echo "::set-output name=matrix::$(julia --project=${GITHUB_WORKSPACE} .ci/generateGithubActions.jl 2> /dev/null)"
+        run: echo "matrix=$(julia --project=${GITHUB_WORKSPACE} .ci/generateGithubActions.jl 2> /dev/null)" >> $GITHUB_OUTPUT
     outputs:
         matrix: ${{ steps.set-matrix.outputs.matrix }}
 
