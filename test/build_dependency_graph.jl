@@ -6,7 +6,7 @@ import Term.Trees: Tree
 # compare each node of both generated dependency graphs
 # the test requires, that both algorithm processes the dependencies in Pkg.project().dependencies()
 # and Pkg.dependencies()[uuid].dependencies() in the same order
-function compare_nodes(integTest, pkgDep, origin_string="graph: root")
+function compare_nodes(integTest, pkgDep, origin_string = "graph: root")
     if isnothing(integTest) || isnothing(pkgDep)
         @test isnothing(integTest) == isnothing(pkgDep)
         return nothing
@@ -44,11 +44,12 @@ function compare_nodes(integTest, pkgDep, origin_string="graph: root")
 
         compare_nodes(integTest[child], pkgDep[pkgDep_name], origin_string * "->" * child)
     end
+    return
 end
 
 @testset "compare build_dependency_graph() with reference implementation for PkgDependency" begin
-    # The test takes the dependency graph of the test environment from IntegrationTest, 
-    # builds the dependency graph with IntegrationTests.build_dependency_graph() and the 
+    # The test takes the dependency graph of the test environment from IntegrationTest,
+    # builds the dependency graph with IntegrationTests.build_dependency_graph() and the
     # reference implementation PkgDependency.builddict() and compares the graphs node by node.
     inteGrationTestsGraph = IntegrationTests.build_dependency_graph()
     pkgDependencyGraph::AbstractDict = PkgDependency.builddict(

@@ -9,7 +9,7 @@ end
     project_tree = Dict("MyMainProject.jl 1.0.0" => Dict("MyDep1.jl 1.0.0" => Dict()))
 
     if printTree()
-        print(Tree(project_tree; name="direct dependency to main"))
+        print(Tree(project_tree; name = "direct dependency to main"))
     end
 
     # dependency exist and prefix is correct
@@ -43,7 +43,7 @@ end
         ),
     )
     if printTree()
-        print(Tree(project_tree; name="test package filter api"))
+        print(Tree(project_tree; name = "test package filter api"))
     end
 
     @testset "single package name" begin
@@ -176,7 +176,7 @@ end
                         )
     #! format: on
     if printTree()
-        print(Tree(project_tree; name="complex dependencies"))
+        print(Tree(project_tree; name = "complex dependencies"))
     end
 
     package_filter = [
@@ -226,7 +226,7 @@ end
     )
 
     if printTree()
-        print(Tree(project_tree; name="circular dependencies"))
+        print(Tree(project_tree; name = "circular dependencies"))
     end
 
     package_filter = ["MyMainProject.jl", "MyDep1.jl", "MyDep2.jl"]
