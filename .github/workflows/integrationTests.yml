@@ -39,7 +39,7 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - name: Run integration test script
         run: julia --project=${GITHUB_WORKSPACE} .ci/getDeps.jl
-  
+
   generate:
     name: Github Action - Generator Integration Jobs
     runs-on: ubuntu-latest

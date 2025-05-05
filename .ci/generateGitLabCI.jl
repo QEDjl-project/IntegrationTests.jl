@@ -15,14 +15,14 @@ Generate a GitLab CI job yaml file for a given package name and print it to stdo
 - `package_name`: Name of the package
 """
 function print_job_yaml(package_name::AbstractString)
-    # Do not use a YAML library, as the generated YAML code is too simple to justify 
+    # Do not use a YAML library, as the generated YAML code is too simple to justify
     # the additional runtime of installing the YAML package.
     job_yaml = """integrationTest$package_name:
-          image: "alpine:latest"
-          script:
-              - echo "run Integration Test for package $package_name"
+        image: "alpine:latest"
+        script:
+            - echo "run Integration Test for package $package_name"
 
-      """
+    """
     return print(job_yaml)
 end
 

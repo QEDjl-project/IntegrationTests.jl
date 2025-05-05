@@ -13,7 +13,7 @@ Creates a Julia package ecosystem in the `base_path` folder for testing purposes
 
 """
 function create_package_eco_system(base_path)
-    # A graphical representation of the dependencies between the packages can be found in the 
+    # A graphical representation of the dependencies between the packages can be found in the
     # README.md.
 
     cd(base_path)
@@ -30,26 +30,26 @@ function create_package_eco_system(base_path)
     Pkg.add("Test")
 
     Pkg.activate("MyPkgD")
-    Pkg.develop(; path=joinpath(base_path, "MyPkgE"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgE"))
 
     Pkg.activate("MyPkgC")
     Pkg.add("JSON")
-    Pkg.develop(; path=joinpath(base_path, "MyPkgE"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgE"))
 
     Pkg.activate("MyPkgB")
-    Pkg.develop(; path=joinpath(base_path, "MyPkgE"))
-    Pkg.develop(; path=joinpath(base_path, "MyPkgC"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgE"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgC"))
     Pkg.add("PkgTemplates")
 
     Pkg.activate("MyPkgA")
-    Pkg.develop(; path=joinpath(base_path, "MyPkgE"))
-    Pkg.develop(; path=joinpath(base_path, "MyPkgD"))
-    Pkg.develop(; path=joinpath(base_path, "MyPkgC"))
-    Pkg.develop(; path=joinpath(base_path, "MyPkgB"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgE"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgD"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgC"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgB"))
     Pkg.add("YAML")
 
     Pkg.activate("MyPkgMeta")
-    Pkg.develop(; path=joinpath(base_path, "MyPkgA"))
+    Pkg.develop(; path = joinpath(base_path, "MyPkgA"))
 
     return Nothing
 end

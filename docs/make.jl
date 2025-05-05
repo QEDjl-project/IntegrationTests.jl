@@ -1,10 +1,9 @@
-
 using Pkg
 
 # targeting the correct source code
 # this asumes the make.jl script is located in QEDbase.jl/docs
 project_path = Base.Filesystem.joinpath(Base.Filesystem.dirname(Base.source_path()), "..")
-Pkg.develop(; path=project_path)
+Pkg.develop(; path = project_path)
 
 using Documenter
 using DocumenterMermaid
@@ -38,19 +37,19 @@ pages = [
 ]
 
 makedocs(;
-    sitename="IntegrationTests.jl",
-    format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://qedjl-project.gitlab.io/IntegrationTests.jl",
-        assets=String[],
+    sitename = "IntegrationTests.jl",
+    format = Documenter.HTML(;
+        prettyurls = get(ENV, "CI", "false") == "true",
+        canonical = "https://qedjl-project.gitlab.io/IntegrationTests.jl",
+        assets = String[],
     ),
-    modules=[IntegrationTests],
-    authors="Simeon Ehrig",
-    repo=Documenter.Remotes.GitHub("QEDjl-project", "IntegrationTests.jl "),
-    pages=pages,
+    modules = [IntegrationTests],
+    authors = "Simeon Ehrig",
+    repo = Documenter.Remotes.GitHub("QEDjl-project", "IntegrationTests.jl "),
+    pages = pages,
 )
 
 # delete README.md in the doc/src folder so that no one can accidentally edit the wrong file
 rm(index_path)
 
-deploydocs(; repo="github.com/QEDjl-project/IntegrationTests.jl.git", push_preview=false)
+deploydocs(; repo = "github.com/QEDjl-project/IntegrationTests.jl.git", push_preview = false)

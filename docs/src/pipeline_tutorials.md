@@ -30,7 +30,7 @@ generateIntegrationTests:
 runIntegrationTests:
   stage: runTests
   trigger:
-    include: 
+    include:
     - artifact: jobs.yaml
       job: generateIntegrationTests
     strategy: depend
